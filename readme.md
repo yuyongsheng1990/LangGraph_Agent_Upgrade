@@ -72,7 +72,7 @@ Explain key codes:
 
 ---
 
-## Final_LangGraph_Agent_v2
+## LangGraph_Agent_v2
 \+ conditional rollback + subgraph formalizer  
 => shared_state + conditional rollback + LLM API + checkpoint + manually check + section-by-section upgrade + consistency-driven loop
 - why do we need section-by-section work? Because each work object is different.  
@@ -90,3 +90,34 @@ Explain key codes:
 - revise_work(): when consistency_report output fail decision, not revise whole paper, but section modification.  
     ↓
 - revision_loop(): put revise_work again to reviewer attack and consistency check.
+
+---
+
+## LangGraph_Agent_v3: LangGraph + Auto-Codex
+update v3: when a review/consistency failure occurs, instead of interrupting for human-feedback, the agent first automatically fills in the textural gaps, then automatically invoke Codex to implement evidence experiments based on local datasets and codes to fills in the evidence gaps, then re-examine the issue, and finally implements a human-in-the-loop process.
+
+### workflow
+review/consistency fail:
+- auto-complement concepts/formulas/sections
+- auto-construct reviewer-driven experiment requests
+- auto-invoke Codex run needed evidence experiments based on local datasets and codes
+- collect artifacts
+- re-write results table/figure to paper.md
+- re-consistency check
+- if fails again, then go to human_feedback.
+
+
+    step-3: if lacking evidence, then converted into experiment_requests.
+    - not to run future experiments.
+    - but review fails -> automatically convert to Codex executable experiment tasks, generating experiment_request.json
+
+    step-4: auto-scan local datasets and codes
+    - prevent Codex running hallucination.
+
+    step-5: invoke Codex to run local codes and datasets
+    - forbid LLM to imagine experiments
+    - but depend on what reviewer needs
+    - depend on what local codes and datasets are
+    - directly generate or modify runner.
+    - run
+    - save results to artifact.
